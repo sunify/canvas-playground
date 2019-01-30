@@ -1,0 +1,19 @@
+{
+  "name": "bg-playground",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@sunify/lerp-color": "^1.0.0",
+    "memoize": "^0.1.1",
+    "run-with-fps": "^1.0.4",
+    "simplex-noise": "^2.4.0",
+    "vector2d": "^3.0.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.11.0"
+  },
+  "scripts": {
+    "start": "parcel index.html --open"
+  }
+}
