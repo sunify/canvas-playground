@@ -1,10 +1,9 @@
 import runWithFps from 'run-with-fps';
 import SimplexNoise from 'simplex-noise';
 import Point, { distFast } from './point';
-import { Vector } from 'vector2d';
+import Vector from 'victor';
 import lerp from '@sunify/lerp-color';
 import eases from 'eases';
-import { isContext } from 'vm';
 
 // const lerp = memoize(lerpColor);
 
@@ -45,14 +44,18 @@ const draw = () => {
   points.forEach(([p, t, angle]) => {
     const age = (Date.now() - t) / ttl;
     ctx.strokeStyle = lerp(
-      `rgba(255, 255, 120, 0.6)`,
-      `rgba(255, 204, 0, 0.5)`,
+      `rgba(255, 255, 120, 0.8)`,
+      `rgba(255, 100, 0, ${1 - age})`,
       eases.cubicIn(age)
     );
-    ctx.shadowColor = ctx.strokeStyle;
+    ctx.shadowColor = lerp(
+      `rgba(255, 255, 120, 1)`,
+      `rgba(255, 100, 0, 0)`,
+      eases.cubicIn(age)
+    );
     p.update();
-    const dx = Math.cos(angle) * p.vel.length() * 2;
-    const dy = Math.sin(angle) * p.vel.length() * 2;
+    const dx = Math.cos(p.vel.angle()) * p.vel.length() * 2;
+    const dy = Math.sin(p.vel.angle()) * p.vel.length() * 2;
     ctx.beginPath();
     ctx.moveTo(p.pos.x - dx, p.pos.y - dy);
     ctx.lineTo(p.pos.x, p.pos.y);
@@ -81,9 +84,9 @@ document.addEventListener('mousemove', e => {
       mouseTrack[1][1]
     );
 
-    for (let i = 0; i < 20; i += 1) {
+    for (let i = 0; i < 10; i += 1) {
       const angle = baseAngle + (Math.PI / 2) * (0.5 - Math.random()); // spread particles a little
-      const len = Math.max(-10, -10 * (baseLen / 7)) * Math.random();
+      const len = Math.max(-20, -10 * (baseLen / 7)) * Math.random();
       points.push([
         new Point(
           new Vector(e.pageX, e.pageY),
@@ -98,6 +101,31 @@ document.addEventListener('mousemove', e => {
   trackClearanceTimeout = setTimeout(() => {
     mouseTrack = [];
   }, 100);
+});
+
+// let strength = 0;
+// let interval;
+// document.addEventListener('mousedown', e => {
+//   strength = 10;
+//   interval = setInterval(() => {
+//     strength += 10;
+//   }, 100);
+// });
+document.addEventListener('mouseup', e => {
+  // clearInterval(interval);
+  for (let i = 0; i < 100; i += 1) {
+    const angle = Math.PI * 2 * Math.random(); // spread particles a little
+    const len = 10 + 40 * Math.random();
+    points.push([
+      new Point(
+        new Vector(e.pageX, e.pageY),
+        new Vector(len * Math.cos(angle), len * Math.sin(angle)),
+        new Vector(0, 1)
+      ),
+      Date.now() + Math.random() * 1000,
+      angle
+    ]);
+  }
 });
 
 const stop = runWithFps(draw, 20);

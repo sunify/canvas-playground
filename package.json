@@ -9,7 +9,7 @@
     "memoize": "^0.1.1",
     "run-with-fps": "^1.0.4",
     "simplex-noise": "^2.4.0",
-    "vector2d": "^3.0.0"
+    "victor": "^1.1.0"
   },
   "devDependencies": {
     "parcel-bundler": "^1.11.0"

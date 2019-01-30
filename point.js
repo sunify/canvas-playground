@@ -18,11 +18,12 @@ export default class Point {
     this.pos = pos;
     this.acc = acc || new Vector(0, 0);
     this.vel = vel || new Vector(0, 0);
+    this.friction = new Vector(0.6, 0.6);
   }
 
   update(width, height) {
     this.vel.add(this.acc);
-    this.vel.mulS(0.6);
+    this.vel.multiply(this.friction);
     this.pos.add(this.vel);
 
     if (this.pos.x > width) {
