@@ -1,8 +1,9 @@
 import runWithFps from 'run-with-fps';
 import SimplexNoise from 'simplex-noise';
-import Point from './point';
+import Point, { distFast } from './point';
 import { Vector } from 'vector2d';
 import lerp from '@sunify/lerp-color';
+import eases from 'eases';
 import { isContext } from 'vm';
 
 // const lerp = memoize(lerpColor);
@@ -16,97 +17,88 @@ const ctx = canvas.getContext('2d');
 canvas.width = width;
 canvas.height = height;
 
-const field = [];
-const gridSize = 20;
-
-const points = [];
-for (let i = 0; i < 100; i += 1) {
-  points.push(
-    new Point(
-      new Vector(width * Math.random(), height * Math.random()),
-      new Vector((0.5 - Math.random()) * 20, (0.5 - Math.random()) * 20),
-      new Vector((0.5 - Math.random()) * 20, (0.5 - Math.random()) * 20)
-    )
-  );
-}
-
-const updateField = () => {
-  for (let i = 0; i < width / gridSize; i += 1) {
-    field[i] = [];
-    for (let j = 0; j < width / gridSize; j += 1) {
-      field[i][j] = noise.noise3D(i / 10, j / 10, Date.now() / 4000);
+const drawLine = path => {
+  ctx.beginPath();
+  path.forEach(([x, y], i) => {
+    if (i === 0) {
+      ctx.moveTo(x, y);
+    } else {
+      ctx.lineTo(x, y);
     }
-  }
+  });
+  ctx.stroke();
 };
 
-const drawPoints = () => {
-  points.forEach(p => {
-    p.applyToField(field, gridSize);
-    p.update(width, height);
-    const i = Math.round(p.pos.x / gridSize);
-    const j = Math.round(p.pos.y / gridSize);
-    if (field[i] && field[i][j]) {
-      const n = field[i][j];
-      ctx.fillStyle = lerp(
-        'rgba(0, 230, 230, 0.4)',
-        'rgba(255, 255, 204, 0.4)',
-        Math.max(0, Math.min(n * 1.5, 1))
-      );
-      // ctx.fillRect(i * gridSize, j * gridSize, gridSize, gridSize);
-      ctx.beginPath();
-      ctx.arc(p.pos.x, p.pos.y, Math.abs((gridSize * n) / 1.5), 0, 2 * Math.PI);
-      ctx.fill();
-      // const n = field[i][j] / 1000;
-      // const r = Math.abs(n * 20000);
-      // const dx = r * Math.cos(n * Math.PI);
-      // const dy = r * Math.sin(n * Math.PI);
-      // ctx.strokeStyle = lerp(
-      //   'rgba(255, 255, 204, 0.4)',
-      //   'rgba(255, 255, 0, 0.4)',
-      //   Math.max(0, Math.min(Math.log(p.vel.lengthSq() * 2), 1))
-      // );
-      // ctx.beginPath();
-      // ctx.moveTo(p.pos.x - dx, p.pos.y - dy);
-      // ctx.lineTo(p.pos.x + dx, p.pos.y + dy);
-      // ctx.stroke();
-    }
+let points = [];
+
+const draw = () => {
+  canvas.width = canvas.width;
+  if (mouseTrack.length > 1) {
+    // ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
+    // drawLine(mouseTrack);
+  }
+
+  const ttl = 1300;
+  points = points.filter(([_, t]) => Date.now() - t < ttl);
+  ctx.shadowBlur = 10;
+  ctx.shadowColor = '#FF0';
+  points.forEach(([p, t, angle]) => {
+    const age = (Date.now() - t) / ttl;
+    ctx.strokeStyle = lerp(
+      `rgba(255, 255, 120, 0.6)`,
+      `rgba(255, 204, 0, 0.5)`,
+      eases.cubicIn(age)
+    );
+    ctx.shadowColor = ctx.strokeStyle;
+    p.update();
+    const dx = Math.cos(angle) * p.vel.length() * 2;
+    const dy = Math.sin(angle) * p.vel.length() * 2;
+    ctx.beginPath();
+    ctx.moveTo(p.pos.x - dx, p.pos.y - dy);
+    ctx.lineTo(p.pos.x, p.pos.y);
+    ctx.stroke();
   });
 };
 
-const drawDots = () => {
-  for (let i = 0; i < width / gridSize; i += 1) {
-    for (let j = 0; j < height / gridSize; j += 1) {
-      if (field[i] && field[i][j] !== undefined) {
-        const n = field[i][j];
-        ctx.fillStyle = lerp(
-          'rgba(0, 230, 230, 0.4)',
-          'rgba(255, 255, 204, 0.4)',
-          Math.max(0, Math.min(n * 1.5, 1))
-        );
-        // ctx.fillRect(i * gridSize, j * gridSize, gridSize, gridSize);
-        ctx.beginPath();
-        ctx.arc(
-          i * gridSize,
-          j * gridSize,
-          Math.abs((gridSize * n) / 3),
-          0,
-          2 * Math.PI
-        );
-        ctx.fill();
-      }
+let mouseTrack = [];
+let trackClearanceTimeout;
+document.addEventListener('mousemove', e => {
+  mouseTrack.push([e.pageX, e.pageY]);
+  mouseTrack = mouseTrack.slice(-2);
+  if (trackClearanceTimeout) {
+    clearTimeout(trackClearanceTimeout);
+  }
+
+  if (mouseTrack.length > 1) {
+    const baseAngle = Math.atan2(
+      mouseTrack[1][1] - mouseTrack[0][1],
+      mouseTrack[1][0] - mouseTrack[0][0]
+    );
+    const baseLen = distFast(
+      mouseTrack[0][0],
+      mouseTrack[0][1],
+      mouseTrack[1][0],
+      mouseTrack[1][1]
+    );
+
+    for (let i = 0; i < 20; i += 1) {
+      const angle = baseAngle + (Math.PI / 2) * (0.5 - Math.random()); // spread particles a little
+      const len = Math.max(-10, -10 * (baseLen / 7)) * Math.random();
+      points.push([
+        new Point(
+          new Vector(e.pageX, e.pageY),
+          new Vector(len * Math.cos(angle), len * Math.sin(angle))
+        ),
+        Date.now(),
+        angle
+      ]);
     }
   }
-};
-updateField();
-for (let i = 0; i < 1000; i += 1) {
-  // drawPoints();
-}
-const draw = () => {
-  updateField();
-  canvas.width = canvas.width;
-  drawDots();
-  // drawPoints();
-};
+
+  trackClearanceTimeout = setTimeout(() => {
+    mouseTrack = [];
+  }, 100);
+});
 
 const stop = runWithFps(draw, 20);
 

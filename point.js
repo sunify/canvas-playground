@@ -22,7 +22,7 @@ export default class Point {
 
   update(width, height) {
     this.vel.add(this.acc);
-    this.vel.mulS(0.99);
+    this.vel.mulS(0.6);
     this.pos.add(this.vel);
 
     if (this.pos.x > width) {

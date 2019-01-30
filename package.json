@@ -5,6 +5,7 @@
   "license": "MIT",
   "dependencies": {
     "@sunify/lerp-color": "^1.0.0",
+    "eases": "^1.0.8",
     "memoize": "^0.1.1",
     "run-with-fps": "^1.0.4",
     "simplex-noise": "^2.4.0",
