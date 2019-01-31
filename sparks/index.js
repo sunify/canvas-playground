@@ -4,8 +4,6 @@ import Vector from 'victor';
 import lerp from '@sunify/lerp-color';
 import eases from 'eases';
 
-// const lerp = memoize(lerpColor);
-
 const { innerWidth: width, innerHeight: height } = window;
 
 const canvas = document.getElementById('bg');
@@ -45,7 +43,7 @@ const draw = () => {
     ctx.strokeStyle = lerp(
       `rgba(255, 255, 120, 0.7)`,
       `rgba(255, 25, 0, ${1 - age})`,
-      eases.cubicIn(age)
+      eases.quartInOut(age)
     );
     ctx.shadowColor = lerp(
       `rgba(255, 255, 120, 0.4)`,
@@ -138,16 +136,20 @@ const fireworks = (x, y) => {
   }
 };
 
-document.addEventListener('mouseup', e => {
-  // fireworks(e.pageX, e.pageY);
-  for (let i = 0; i < 10; i++) {
-    setTimeout(() => {
-      fireworks(width * Math.random(), height * Math.random());
-    }, 1000 * Math.random());
-  }
-});
+const handleClick = e => {
+  console.log(e);
+  fireworks(e.pageX, e.pageY);
+  // for (let i = 0; i < 10; i++) {
+  //   setTimeout(() => {
+  //     fireworks(width * Math.random(), height * Math.random());
+  //   }, 1000 * Math.random());
+  // }
+};
 
-const stop = runWithFps(draw, 20);
+document.addEventListener('mouseup', handleClick);
+document.addEventListener('touchend', handleClick);
+
+const stop = runWithFps(draw, 30);
 
 // Handle hot module replacement
 if (module.hot) {
