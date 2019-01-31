@@ -104,6 +104,9 @@ let mouseMoving = false;
 let mouseTrack = [];
 let trackClearanceTimeout;
 document.addEventListener('mousemove', e => {
+  if (mouseMoving === false) {
+    mouseTrack = [];
+  }
   mouseTrack.push([e.pageX, e.pageY]);
   mouseTrack = mouseTrack.slice(-2);
   mouseMoving = true;
@@ -136,12 +139,12 @@ const fireworks = (x, y) => {
 };
 
 document.addEventListener('mouseup', e => {
-  fireworks(e.pageX, e.pageY);
-  // for (let i = 0; i < 10; i++) {
-  //   setTimeout(() => {
-  //     fireworks(width * Math.random(), height * Math.random());
-  //   }, 1000 * Math.random());
-  // }
+  // fireworks(e.pageX, e.pageY);
+  for (let i = 0; i < 10; i++) {
+    setTimeout(() => {
+      fireworks(width * Math.random(), height * Math.random());
+    }, 1000 * Math.random());
+  }
 });
 
 const stop = runWithFps(draw, 20);

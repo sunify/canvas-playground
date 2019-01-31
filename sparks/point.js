@@ -14,11 +14,11 @@ export function distFast(x1, y1, x2, y2) {
 }
 
 export default class Point {
-  constructor(pos, vel, acc) {
+  constructor(pos, vel, acc, friction) {
     this.pos = pos;
     this.acc = acc || new Vector(0, 0);
     this.vel = vel || new Vector(0, 0);
-    this.friction = new Vector(0.7, 0.7);
+    this.friction = friction || new Vector(0.7, 0.7);
   }
 
   update(width, height) {
