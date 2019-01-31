@@ -82,7 +82,7 @@ const emitParticles = (x, y) => {
       mouseTrack[1][1]
     );
 
-    for (let i = 0; i < 10; i += 1) {
+    for (let i = 0; i < 8; i += 1) {
       const angle = baseAngle + (Math.PI / 1.7) * (0.5 - Math.random()); // spread particles a little
       const len = Math.max(-30, -10 * (baseLen / 5)) * Math.random();
       points.push([
@@ -149,7 +149,7 @@ const handleClick = e => {
 document.addEventListener('mouseup', handleClick);
 document.addEventListener('touchend', handleClick);
 
-const stop = runWithFps(draw, 30);
+const stop = runWithFps(draw, 20);
 
 // Handle hot module replacement
 if (module.hot) {
