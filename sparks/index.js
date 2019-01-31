@@ -3,14 +3,38 @@ import Point, { distFast } from './point';
 import Vector from 'victor';
 import lerp from '@sunify/lerp-color';
 import eases from 'eases';
+import memoize from 'lodash/memoize';
+
+var PIXEL_RATIO = (function() {
+  var ctx = document.createElement('canvas').getContext('2d'),
+    dpr = window.devicePixelRatio || 1,
+    bsr =
+      ctx.webkitBackingStorePixelRatio ||
+      ctx.mozBackingStorePixelRatio ||
+      ctx.msBackingStorePixelRatio ||
+      ctx.oBackingStorePixelRatio ||
+      ctx.backingStorePixelRatio ||
+      1;
+
+  return dpr / bsr;
+})();
 
 const { innerWidth: width, innerHeight: height } = window;
 
+const canvasValue = v => v * PIXEL_RATIO;
+
 const canvas = document.getElementById('bg');
 const ctx = canvas.getContext('2d');
+canvas.width = canvasValue(width);
+canvas.height = canvasValue(height);
+canvas.style.width = width + 'px';
+canvas.style.height = height + 'px';
+// ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
 
-canvas.width = width;
-canvas.height = height;
+// canvas.width = width;
+// canvas.height = height;
+
+// const lerp = memoize(lerpColor);
 
 const drawLine = path => {
   ctx.beginPath();
@@ -37,24 +61,25 @@ const draw = () => {
 
   const ttl = 1300;
   points = points.filter(([_, t]) => Date.now() - t < ttl);
-  ctx.shadowBlur = 10;
+  // ctx.shadowBlur = 10;
   points.forEach(([p, t]) => {
     const age = (Date.now() - t) / ttl;
     ctx.strokeStyle = lerp(
       `rgba(255, 255, 120, 0.7)`,
-      `rgba(255, 25, 0, ${1 - age})`,
+      `rgba(255, 25, 0, 0.3)`,
       eases.quartInOut(age)
     );
-    ctx.shadowColor = lerp(
-      `rgba(255, 255, 120, 0.4)`,
-      `rgba(255, 255, 120, 0.2)`,
-      eases.cubicIn(age)
-    );
+    // ctx.shadowColor = lerp(
+    //   `rgba(255, 255, 120, 0.4)`,
+    //   `rgba(255, 255, 120, 0.2)`,
+    //   eases.cubicIn(age)
+    // );
+    ctx.lineWidth = PIXEL_RATIO;
     p.update();
-    const dx = Math.cos(p.vel.angle()) * p.vel.length() * 2;
-    const dy = Math.sin(p.vel.angle()) * p.vel.length() * 2;
+    const dx = (Math.cos(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
+    const dy = (Math.sin(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
     ctx.beginPath();
-    ctx.moveTo(p.pos.x - dx, p.pos.y - dy);
+    ctx.moveTo(p.pos.x + dx, p.pos.y + dy);
     ctx.lineTo(p.pos.x, p.pos.y);
     ctx.stroke();
   });
@@ -82,12 +107,12 @@ const emitParticles = (x, y) => {
       mouseTrack[1][1]
     );
 
-    for (let i = 0; i < 8; i += 1) {
+    for (let i = 0; i < 15; i += 1) {
       const angle = baseAngle + (Math.PI / 1.7) * (0.5 - Math.random()); // spread particles a little
-      const len = Math.max(-30, -10 * (baseLen / 5)) * Math.random();
+      const len = Math.max(-40, -10 * (baseLen / 3)) * Math.random();
       points.push([
         new Point(
-          new Vector(x, y),
+          new Vector(canvasValue(x), canvasValue(y)),
           new Vector(len * Math.cos(angle), len * Math.sin(angle)),
           new Vector(-0.1 * Math.cos(angle), -0.1 * Math.sin(angle))
         ),
@@ -101,7 +126,11 @@ const emitParticles = (x, y) => {
 let mouseMoving = false;
 let mouseTrack = [];
 let trackClearanceTimeout;
-document.addEventListener('mousemove', e => {
+
+const handleMove = e => {
+  if (e.touches) {
+    e.preventDefault();
+  }
   if (mouseMoving === false) {
     mouseTrack = [];
   }
@@ -118,12 +147,15 @@ document.addEventListener('mousemove', e => {
     mouseTrack = [];
     mouseMoving = false;
   }, 400);
-});
+};
+document.addEventListener('mousemove', handleMove);
+document.addEventListener('touchforcechange', () => undefined, false);
+document.addEventListener('touchmove', handleMove, { passive: false });
 
 const fireworks = (x, y) => {
   for (let i = 0; i < 40; i += 1) {
     const angle = Math.PI * 2 * Math.random();
-    const len = 10 + 80 * Math.random();
+    const len = 30 + 120 * Math.random() * PIXEL_RATIO;
     points.push([
       new Point(
         new Vector(x, y),
@@ -137,13 +169,18 @@ const fireworks = (x, y) => {
 };
 
 const handleClick = e => {
-  console.log(e);
-  fireworks(e.pageX, e.pageY);
-  // for (let i = 0; i < 10; i++) {
-  //   setTimeout(() => {
-  //     fireworks(width * Math.random(), height * Math.random());
-  //   }, 1000 * Math.random());
-  // }
+  if (e.altKey) {
+    for (let i = 0; i < 20; i++) {
+      setTimeout(() => {
+        fireworks(
+          canvasValue(width) * Math.random(),
+          canvasValue(height) * Math.random()
+        );
+      }, 2000 * Math.random());
+    }
+  } else {
+    fireworks(canvasValue(e.pageX), canvasValue(e.pageY));
+  }
 };
 
 document.addEventListener('mouseup', handleClick);

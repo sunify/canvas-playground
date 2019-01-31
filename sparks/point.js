@@ -2,8 +2,8 @@ import Vector from 'victor';
 
 export function distFast(x1, y1, x2, y2) {
   // Approximation by using octagons approach
-  const x = x2 - x1;
-  const y = y2 - y1;
+  const x = x2 - x1 || 0.001;
+  const y = y2 - y1 || 0.001;
   return (
     1.426776695 *
     Math.min(
