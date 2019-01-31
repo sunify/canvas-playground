@@ -1,16 +1,13 @@
 import runWithFps from 'run-with-fps';
-import SimplexNoise from 'simplex-noise';
 import Point, { distFast } from './point';
 import Vector from 'victor';
 import lerp from '@sunify/lerp-color';
 import eases from 'eases';
-import { emit } from 'cluster';
 
 // const lerp = memoize(lerpColor);
 
 const { innerWidth: width, innerHeight: height } = window;
 
-const noise = new SimplexNoise();
 const canvas = document.getElementById('bg');
 const ctx = canvas.getContext('2d');
 
