@@ -15,6 +15,7 @@
     "parcel-bundler": "^1.11.0"
   },
   "scripts": {
+    "test": "exit 0",
     "start": "parcel ${PREFIX}index.html -d ${PREFIX}dist --open",
     "build": "parcel build -d ${PREFIX}dist --public-url '.' ${PREFIX}index.html"
   }
