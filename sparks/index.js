@@ -39,12 +39,12 @@ const draw = () => {
 
   const ttl = 1300;
   points = points.filter(([_, t]) => Date.now() - t < ttl);
-  ctx.shadowBlur = 15;
+  ctx.shadowBlur = 10;
   points.forEach(([p, t]) => {
     const age = (Date.now() - t) / ttl;
     ctx.strokeStyle = lerp(
       `rgba(255, 255, 120, 0.7)`,
-      `rgba(255, 0, 0, 0.3)`,
+      `rgba(255, 25, 0, ${1 - age})`,
       eases.cubicIn(age)
     );
     ctx.shadowColor = lerp(
@@ -62,7 +62,7 @@ const draw = () => {
   });
 
   if (!mouseMoving) {
-    const a = Date.now() / 800;
+    const a = Date.now() / 3000;
     const cx = width / 2 + Math.cos(a) * 200;
     const cy = height / 2 + Math.sin(a) * 300 * (Math.cos(a) / 2);
     mouseTrack.push([cx, cy]);
@@ -85,15 +85,15 @@ const emitParticles = (x, y) => {
     );
 
     for (let i = 0; i < 10; i += 1) {
-      const angle = baseAngle + (Math.PI / 2) * (0.5 - Math.random()); // spread particles a little
-      const len = Math.max(-20, -10 * (baseLen / 7)) * Math.random();
+      const angle = baseAngle + (Math.PI / 1.7) * (0.5 - Math.random()); // spread particles a little
+      const len = Math.max(-30, -10 * (baseLen / 5)) * Math.random();
       points.push([
         new Point(
           new Vector(x, y),
           new Vector(len * Math.cos(angle), len * Math.sin(angle)),
-          new Vector(-0.4 * Math.cos(angle), -0.4 * Math.sin(angle))
+          new Vector(-0.1 * Math.cos(angle), -0.1 * Math.sin(angle))
         ),
-        Date.now(),
+        Date.now() + 100 * Math.random(),
         angle
       ]);
     }
