@@ -1,4 +1,4 @@
-import { Vector } from 'vector2d';
+import Vector from 'victor';
 
 export function distFast(x1, y1, x2, y2) {
   // Approximation by using octagons approach
@@ -18,7 +18,7 @@ export default class Point {
     this.pos = pos;
     this.acc = acc || new Vector(0, 0);
     this.vel = vel || new Vector(0, 0);
-    this.friction = new Vector(0.6, 0.6);
+    this.friction = new Vector(0.7, 0.7);
   }
 
   update(width, height) {
