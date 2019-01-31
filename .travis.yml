@@ -3,9 +3,7 @@ node_js:
   - '10'
 
 before_deploy:
-  - yarn build
-  - PREFIX=dots/ yarn build && mv dots/dist dist/dots
-  - PREFIX=sparks/ yarn build && mv sparks/dist dist/sparks
+  - PUBLIC_URL=/canvas-playground yarn build
 
 deploy:
   provider: pages
