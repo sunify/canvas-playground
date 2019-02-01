@@ -29,12 +29,7 @@ canvas.width = canvasValue(width);
 canvas.height = canvasValue(height);
 canvas.style.width = width + 'px';
 canvas.style.height = height + 'px';
-// ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-// canvas.width = width;
-// canvas.height = height;
-
-// const lerp = memoize(lerpColor);
+console.log(canvas);
 
 const drawLine = path => {
   ctx.beginPath();
@@ -50,8 +45,72 @@ const drawLine = path => {
 
 let points = [];
 
+// https://en.wikipedia.org/wiki/Lemniscate_of_Gerono
+const followInfinity = () => {
+  time += 0.015;
+  const a = time;
+  const cx = width / 2 + Math.cos(a) * 300;
+  const cy = height / 2 + Math.sin(a) * 200 * (Math.cos(a) * 1.3);
+  mouseTrack.push([cx, cy]);
+};
+
+// https://en.wikipedia.org/wiki/Spiral
+const followSpiral = () => {
+  if (time === 0) {
+    time = 1;
+  }
+  time += 0.03;
+  const a = 2;
+  const b = time ** 0.61;
+
+  const angle = Math.log(time) ** 2.35;
+  const x = width / 2 + (a + b * angle) * Math.cos(angle);
+  const y = height / 2 + (a + b * angle) * Math.sin(angle);
+  mouseTrack.push([x, y]);
+};
+
+// https://en.wikipedia.org/wiki/Lorenz_system#Lorenz_attractor
+const lorenz = {
+  x: 5,
+  y: 5,
+  z: 4
+};
+const followLorenz = () => {
+  const a = 6,
+    b = 22,
+    c = 3;
+  const dt = 0.003;
+  const { x, y, z } = lorenz;
+  const x1 = lorenz.x + a * (-x + y) * dt;
+  const y1 = lorenz.y + (b * x - y - z * x) * dt;
+  const z1 = lorenz.z + (-c * z + x * y) * dt;
+  mouseTrack.push([width / 2 + x1 * 15, height / 2 + y1 * 15]);
+  lorenz.x = x1;
+  lorenz.y = y1;
+  lorenz.z = z1;
+};
+
+// https://en.wikipedia.org/wiki/Rose_(mathematics)
+const followRose = () => {
+  time += 0.01;
+  const a = time;
+  const k = 4 / 5;
+  const r = 1.5;
+  const cx = width / 2 + Math.cos((a / k) * r) * 200 * Math.cos(a * r);
+  const cy = height / 2 + Math.sin((a / k) * r) * 200 * Math.cos(a * r);
+  mouseTrack.push([cx, cy]);
+};
+
+const followFunctions = [
+  followInfinity,
+  followSpiral,
+  followLorenz,
+  followRose
+];
+
+let time = 0;
 const draw = () => {
-  canvas.width = canvas.width;
+  // canvas.width = canvas.width;
   if (mouseMoving) {
   }
   // if (mouseTrack.length > 1) {
@@ -61,7 +120,6 @@ const draw = () => {
 
   const ttl = 1300;
   points = points.filter(([_, t]) => Date.now() - t < ttl);
-  // ctx.shadowBlur = 10;
   points.forEach(([p, t]) => {
     const age = (Date.now() - t) / ttl;
     ctx.strokeStyle = lerp(
@@ -69,15 +127,12 @@ const draw = () => {
       `rgba(255, 25, 0, 0.3)`,
       eases.quartInOut(age)
     );
-    // ctx.shadowColor = lerp(
-    //   `rgba(255, 255, 120, 0.4)`,
-    //   `rgba(255, 255, 120, 0.2)`,
-    //   eases.cubicIn(age)
-    // );
     ctx.lineWidth = PIXEL_RATIO;
     p.update();
-    const dx = (Math.cos(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
-    const dy = (Math.sin(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
+    const dx =
+      ((Math.cos(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO) * 1.3;
+    const dy =
+      ((Math.sin(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO) * 1.3;
     ctx.beginPath();
     ctx.moveTo(p.pos.x + dx, p.pos.y + dy);
     ctx.lineTo(p.pos.x, p.pos.y);
@@ -85,16 +140,19 @@ const draw = () => {
   });
 
   if (!mouseMoving) {
-    const a = Date.now() / 3000;
-    const cx = width / 2 + Math.cos(a) * 200;
-    const cy = height / 2 + Math.sin(a) * 300 * (Math.cos(a) / 2);
-    mouseTrack.push([cx, cy]);
-    mouseTrack = mouseTrack.slice(-2);
-    emitParticles(cx, cy);
+    followFunctions[3]();
+  }
+
+  mouseTrack = mouseTrack.slice(-2);
+  if (mouseTrack.length > 1) {
+    emitParticles(mouseTrack[1][0], mouseTrack[1][1]);
   }
 };
 
 const emitParticles = (x, y) => {
+  if ((x < 0 || x > width) && (y < 0 || y > height)) {
+    return;
+  }
   if (mouseTrack.length > 1) {
     const baseAngle = Math.atan2(
       mouseTrack[1][1] - mouseTrack[0][1],
@@ -108,8 +166,8 @@ const emitParticles = (x, y) => {
     );
 
     for (let i = 0; i < 15; i += 1) {
-      const angle = baseAngle + (Math.PI / 1.7) * (0.5 - Math.random()); // spread particles a little
-      const len = Math.max(-40, -10 * (baseLen / 3)) * Math.random();
+      const angle = baseAngle + (Math.PI / 3) * (0.5 - Math.random()); // spread particles a little
+      const len = Math.max(-20, -10 * (baseLen / 3)) * Math.random();
       points.push([
         new Point(
           new Vector(canvasValue(x), canvasValue(y)),
@@ -148,14 +206,14 @@ const handleMove = e => {
     mouseMoving = false;
   }, 400);
 };
-document.addEventListener('mousemove', handleMove);
-document.addEventListener('touchforcechange', () => undefined, false);
-document.addEventListener('touchmove', handleMove, { passive: false });
+// document.addEventListener('mousemove', handleMove);
+// document.addEventListener('touchforcechange', () => undefined, false);
+// document.addEventListener('touchmove', handleMove, { passive: false });
 
 const fireworks = (x, y) => {
   for (let i = 0; i < 40; i += 1) {
     const angle = Math.PI * 2 * Math.random();
-    const len = 30 + 120 * Math.random() * PIXEL_RATIO;
+    const len = 30 + 70 * Math.random() * PIXEL_RATIO;
     points.push([
       new Point(
         new Vector(x, y),
