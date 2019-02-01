@@ -65,7 +65,7 @@ const draw = () => {
   points.forEach(([p, t]) => {
     const age = (Date.now() - t) / ttl;
     ctx.strokeStyle = lerp(
-      `rgba(255, 255, 120, 0.7)`,
+      `rgba(255, 255, 120, 1)`,
       `rgba(255, 25, 0, 0.3)`,
       eases.quartInOut(age)
     );
@@ -85,12 +85,12 @@ const draw = () => {
   });
 
   if (!mouseMoving) {
-    const a = Date.now() / 3000;
-    const cx = width / 2 + Math.cos(a) * 200;
-    const cy = height / 2 + Math.sin(a) * 300 * (Math.cos(a) / 2);
-    mouseTrack.push([cx, cy]);
-    mouseTrack = mouseTrack.slice(-2);
-    emitParticles(cx, cy);
+    // const a = Date.now() / 3000;
+    // const cx = width / 2 + Math.cos(a) * 200;
+    // const cy = height / 2 + Math.sin(a) * 300 * (Math.cos(a) / 2);
+    // mouseTrack.push([cx, cy]);
+    // mouseTrack = mouseTrack.slice(-2);
+    // emitParticles(cx, cy);
   }
 };
 
