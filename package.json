@@ -10,6 +10,7 @@
     "memoize": "^0.1.1",
     "run-with-fps": "^1.0.4",
     "simplex-noise": "^2.4.0",
+    "tweeen": "^1.0.5",
     "victor": "^1.1.0"
   },
   "devDependencies": {

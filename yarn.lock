@@ -4350,6 +4350,12 @@ tty-browserify@0.0.0:
   version "0.0.0"
   resolved "https://registry.yarnpkg.com/tty-browserify/-/tty-browserify-0.0.0.tgz#a157ba402da24e9bf957f9aa69d524eed42901a6"
 
+tweeen@^1.0.5:
+  version "1.0.5"
+  resolved "https://registry.yarnpkg.com/tweeen/-/tweeen-1.0.5.tgz#5308c07c03105e76a11583cad327b82a4f100960"
+  dependencies:
+    run-with-fps "^1.0.4"
+
 type-check@~0.3.2:
   version "0.3.2"
   resolved "https://registry.yarnpkg.com/type-check/-/type-check-0.3.2.tgz#5884cab512cf1d355e3fb784f30804b2b520db72"

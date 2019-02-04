@@ -3,7 +3,7 @@ import Point, { distFast } from './point';
 import Vector from 'victor';
 import lerp from '@sunify/lerp-color';
 import eases from 'eases';
-import memoize from 'lodash/memoize';
+import tweeen from 'tweeen';
 
 var PIXEL_RATIO = (function() {
   var ctx = document.createElement('canvas').getContext('2d'),
@@ -29,12 +29,6 @@ canvas.width = canvasValue(width);
 canvas.height = canvasValue(height);
 canvas.style.width = width + 'px';
 canvas.style.height = height + 'px';
-// ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
-
-// canvas.width = width;
-// canvas.height = height;
-
-// const lerp = memoize(lerpColor);
 
 const drawLine = path => {
   ctx.beginPath();
@@ -54,14 +48,9 @@ const draw = () => {
   canvas.width = canvas.width;
   if (mouseMoving) {
   }
-  // if (mouseTrack.length > 1) {
-  //   ctx.strokeStyle = 'rgba(255, 255, 255, 1)';
-  //   drawLine(mouseTrack);
-  // }
 
   const ttl = 1300;
   points = points.filter(([_, t]) => Date.now() - t < ttl);
-  // ctx.shadowBlur = 10;
   points.forEach(([p, t]) => {
     const age = (Date.now() - t) / ttl;
     ctx.strokeStyle = lerp(
@@ -69,11 +58,6 @@ const draw = () => {
       `rgba(255, 25, 0, 0.3)`,
       eases.quartInOut(age)
     );
-    // ctx.shadowColor = lerp(
-    //   `rgba(255, 255, 120, 0.4)`,
-    //   `rgba(255, 255, 120, 0.2)`,
-    //   eases.cubicIn(age)
-    // );
     ctx.lineWidth = PIXEL_RATIO;
     p.update();
     const dx = (Math.cos(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
@@ -83,15 +67,6 @@ const draw = () => {
     ctx.lineTo(p.pos.x, p.pos.y);
     ctx.stroke();
   });
-
-  if (!mouseMoving) {
-    // const a = Date.now() / 3000;
-    // const cx = width / 2 + Math.cos(a) * 200;
-    // const cy = height / 2 + Math.sin(a) * 300 * (Math.cos(a) / 2);
-    // mouseTrack.push([cx, cy]);
-    // mouseTrack = mouseTrack.slice(-2);
-    // emitParticles(cx, cy);
-  }
 };
 
 const emitParticles = (x, y) => {
@@ -128,6 +103,9 @@ let mouseTrack = [];
 let trackClearanceTimeout;
 
 const handleMove = e => {
+  if (stopRocket) {
+    stopRocket();
+  }
   if (e.touches) {
     e.preventDefault();
   }
@@ -187,6 +165,30 @@ document.addEventListener('mouseup', handleClick);
 document.addEventListener('touchend', handleClick);
 
 const stop = runWithFps(draw, 20);
+
+const pos = t => {
+  const x = width / 2 + Math.sin(t * 3) * 2;
+  const y = height - t * 4;
+  return [x, y];
+};
+const stopRocket = tweeen(
+  0,
+  100,
+  t => {
+    const [x, y] = pos(t);
+    mouseTrack.push([x, y]);
+    mouseTrack = mouseTrack.slice(-2);
+    emitParticles(x, y);
+
+    if (t === 100) {
+      fireworks(x * PIXEL_RATIO, y * PIXEL_RATIO);
+    }
+  },
+  {
+    duration: 2000,
+    easing: eases.quadInOut
+  }
+);
 
 // Handle hot module replacement
 if (module.hot) {
