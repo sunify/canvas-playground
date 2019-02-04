@@ -1,0 +1,25 @@
+{
+  "name": "alexanderlunyov.ru",
+  "version": "1.0.0",
+  "description": "",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "autoprefixer-loader": "^2.0.0",
+    "babel": "^5.5.6",
+    "babel-core": "^5.5.6",
+    "babel-loader": "^5.1.4",
+    "css-loader": "^0.14.5",
+    "node-libs-browser": "^0.5.2",
+    "style-loader": "^0.12.3",
+    "webpack": "^1.9.10"
+  },
+  "dependencies": {
+    "raf": "^3.4.1",
+    "voronoi": "^1.0.0"
+  }
+}

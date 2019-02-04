@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "dependencies": {
-    "@sunify/lerp-color": "^1.0.0",
+    "@sunify/lerp-color": "1.1.1",
     "eases": "^1.0.8",
     "lodash": "^4.17.11",
     "memoize": "^0.1.1",

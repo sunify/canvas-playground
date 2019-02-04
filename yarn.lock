@@ -617,9 +617,9 @@
     "@parcel/utils" "^1.11.0"
     physical-cpu-count "^2.0.0"
 
-"@sunify/lerp-color@^1.0.0":
-  version "1.0.0"
-  resolved "https://registry.yarnpkg.com/@sunify/lerp-color/-/lerp-color-1.0.0.tgz#8c1a61acc928446f1f63f7b6d60712ed16e9e78e"
+"@sunify/lerp-color@1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@sunify/lerp-color/-/lerp-color-1.1.1.tgz#dd521eb56f19dee533390b04044b292b043ffdee"
   dependencies:
     "@types/hex-rgb" "^3.0.0"
     "@types/rgb-hex" "^2.1.0"
