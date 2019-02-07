@@ -11,7 +11,7 @@ export class Segment {
     this.angle = angle;
     this.selfAngle = angle;
     this.t = Math.random() * 1000;
-    this.dt = Math.random() * 0.005;
+    this.dt = Math.random() * 0.01;
   }
 
   get length() {

@@ -61,7 +61,7 @@ const draw = () => {
     });
   }
 };
-const stop = runWithFPS(draw, 60);
+const stop = runWithFPS(draw, 30);
 
 // Handle hot module replacement
 if (module.hot) {
