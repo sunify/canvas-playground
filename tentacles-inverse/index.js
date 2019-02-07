@@ -45,8 +45,12 @@ const draw = () => {
   segs.forEach(seg => {
     const root = seg[0];
     const tail = last(seg);
-    root.colorBase += 0.4;
+    root.colorBase += 5;
     tail.follow(mouse);
+    root.position = root.base;
+    for (let i = 1; i < seg.length; i += 1) {
+      seg[i].position = seg[i - 1].end;
+    }
   });
   for (let k = 0; k < size; k += 1) {
     segs.forEach((seg, i) => {

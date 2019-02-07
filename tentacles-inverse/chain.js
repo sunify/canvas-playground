@@ -6,6 +6,7 @@ const noise = new SimplexNoise();
 export class Segment {
   constructor(posOrParent, offset, angle, t = 0) {
     if (posOrParent instanceof Vector) {
+      this.base = posOrParent;
       this.position = posOrParent;
       this.child = null;
       this.parent = null;
@@ -19,6 +20,11 @@ export class Segment {
     this.selfAngle = angle;
     this.t = Math.random() * 1000;
     this.dt = Math.random() * 0.01;
+  }
+
+  wiggle() {
+    this.t += this.dt;
+    this.selfAngle = noise.noise2D(this.t, 200) / 10;
   }
 
   get length() {
@@ -53,7 +59,8 @@ export class Segment {
       target.y - this.position.y,
       target.x - this.position.x
     );
-    this.angle = dirAngle;
+    this.wiggle();
+    this.angle = dirAngle + this.selfAngle;
     this.position = new Vector(
       -this.offset * Math.cos(dirAngle) + target.x,
       -this.offset * Math.sin(dirAngle) + target.y
