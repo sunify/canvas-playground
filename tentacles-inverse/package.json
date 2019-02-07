@@ -1,0 +1,21 @@
+{
+  "name": "noisie",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "Alex Lunyov <isuntc@gmail.com>",
+  "license": "MIT",
+  "dependencies": {
+    "eases": "^1.0.8",
+    "lerp-array": "^1.1.1",
+    "run-with-fps": "1.0.4",
+    "simplex-noise": "^2.4.0",
+    "tweeen": "^1.0.5",
+    "victor": "^1.1.0"
+  },
+  "devDependencies": {
+    "parcel-bundler": "^1.10.3"
+  },
+  "scripts": {
+    "start": "./node_modules/.bin/parcel index.html --open"
+  }
+}
