@@ -36,10 +36,13 @@ for (let j = 0; j < count; j += 1) {
 const last = arr => arr[arr.length - 1];
 
 const mouse = new Vector(width / 2, height / 2);
-document.addEventListener('mousemove', e => {
-  mouse.x = e.pageX;
-  mouse.y = e.pageY;
-});
+const updateMouse = e => {
+  const { pageX, pageY } = (e.touches && e.touches[0]) || e;
+  mouse.x = pageX;
+  mouse.y = pageY;
+};
+document.addEventListener('mousemove', updateMouse);
+document.addEventListener('touchmove', updateMouse);
 const draw = () => {
   canvas.width = canvas.width;
   segs.forEach(seg => {
