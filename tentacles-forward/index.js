@@ -16,34 +16,36 @@ const count = 8;
 const size = 30;
 for (let j = 0; j < count; j += 1) {
   const baseAngle = ((Math.PI * 2) / count) * j;
-  const seg = new Segment(
+  const root = new Segment(
     new Vector(
-      80 * Math.cos(baseAngle) + width / 2,
-      80 * Math.sin(baseAngle) + height / 2
+      65 * Math.cos(baseAngle) + width / 2,
+      65 * Math.sin(baseAngle) + height / 2
     ),
     10,
     baseAngle
   );
-  let cur = seg;
+  root.colorBase = (360 / count) * j;
+  const seg = [root];
+  let cur = root;
   for (let i = 0; i < size; i += 1) {
     cur = cur.addChild(
       new Segment(null, (1 - i / size) * 3, Math.PI / 2, Math.random() / 20)
     );
+    seg.push(cur);
   }
-  seg.colorBase = 360 * Math.random();
   segs.push(seg);
 }
 
 const draw = () => {
   canvas.width = canvas.width;
-  segs.forEach(seg => {
-    seg.colorBase += 0.4;
-    seg.update();
+  segs.forEach(([root]) => {
+    root.colorBase += 5;
+    root.update();
   });
-  const curs = [...segs];
   for (let k = 0; k < size; k += 1) {
-    curs.forEach((cur, i) => {
-      const h = (segs[i].colorBase + eases.quartOut(k / size) * 60) % 360;
+    segs.forEach((seg, i) => {
+      const cur = seg[k];
+      const h = (seg[0].colorBase + eases.quartOut(k / size) * 60) % 360;
       const s = 90 + 10 * eases.elasticOut(k / size);
       const l =
         (60 * (eases.elasticOut(k / size) + eases.linear(k / size))) / 2;
@@ -57,7 +59,6 @@ const draw = () => {
         Math.PI * 2
       );
       ctx.fill();
-      curs[i] = cur.child;
     });
   }
 };
