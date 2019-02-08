@@ -1,14 +1,10 @@
-export function pulsarUpdater(circles) {
+import { random } from '../common/utils';
+
+export function orbitalUpdater(circles) {
   circles.forEach((circle, i) => {
     const t = Date.now() / 1000;
     circle.oradius = circle.oradius || circle.radius;
     circle.radius = circle.oradius + (i % 2 ? Math.sin : Math.cos)(t * 2) * 5;
-  });
-}
-
-export function orbitalUpdater(circles) {
-  circles.forEach(circle => {
-    const t = Date.now() / 1000;
     circle.ox = circle.ox || circle.x;
     circle.oy = circle.oy || circle.y;
     circle.x = circle.ox + (Math.cos(t) * circle.radius * circle.vx) / 2;
@@ -21,23 +17,35 @@ export function orbitalUpdater(circles) {
 
 export const createCircles = (width, height) => [
   {
-    color: [44, 249, 172],
-    radius: 60,
-    x: width / 2 - 100,
-    y: height / 2 + 150,
-    vx: -8,
-    vy: 0,
-    ax: 0,
-    ay: 0
+    color: [0, 255, 170],
+    radius: 50,
+    x: width / 2 + 30,
+    y: height / 2 - 30,
+    vx: random(-2, 2),
+    vy: random(-2, 2)
+  },
+  {
+    color: [0, 255, 170],
+    radius: 40,
+    x: width / 2 + 100,
+    y: height / 2 - 30,
+    vx: random(-5, 2),
+    vy: random(-2, 5)
+  },
+  {
+    color: [255, 255, 0],
+    radius: 75,
+    x: width / 2 + 40,
+    y: height / 2 + 40,
+    vx: random(-5, 2),
+    vy: random(-2, 5)
   },
   {
     color: [255, 255, 0],
     radius: 60,
-    x: width / 2 + 100,
-    y: height / 2 - 150,
-    vx: 8,
-    vy: 0,
-    ax: 0,
-    ay: 0
+    x: width / 2,
+    y: height / 2,
+    vx: random(-2, 2),
+    vy: random(-2, 2)
   }
 ];
