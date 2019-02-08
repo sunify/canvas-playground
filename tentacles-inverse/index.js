@@ -1,6 +1,6 @@
 import runWithFPS from 'run-with-fps';
 import eases from 'eases';
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 import { Segment } from './chain';
 
 const canvas = document.getElementById('canvas');
@@ -11,12 +11,13 @@ const PIXEL_RATIO = 2;
 canvas.width = width * PIXEL_RATIO;
 canvas.height = height * PIXEL_RATIO;
 
+const center = new Vector(width / 2, height / 2);
 const segs = [];
 const count = 1;
 const size = 50;
 const len = 1.4;
 for (let j = 0; j < count; j += 1) {
-  const tail = new Segment(new Vector(width / 2, height / 2), len, 0);
+  const tail = new Segment(center.clone(), len, 0);
   tail.colorBase = 360 * count * j;
   const seg = [tail];
   let cur = tail;
@@ -35,7 +36,7 @@ for (let j = 0; j < count; j += 1) {
 
 const last = arr => arr[arr.length - 1];
 
-const mouse = new Vector(width / 2, height / 2);
+const mouse = center.clone();
 const updateMouse = e => {
   const { pageX, pageY } = (e.touches && e.touches[0]) || e;
   mouse.x = pageX;

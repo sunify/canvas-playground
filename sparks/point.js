@@ -1,4 +1,4 @@
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 
 export function distFast(x1, y1, x2, y2) {
   // Approximation by using octagons approach
@@ -18,12 +18,12 @@ export default class Point {
     this.pos = pos;
     this.acc = acc || new Vector(0, 0);
     this.vel = vel || new Vector(0, 0);
-    this.friction = friction || new Vector(0.7, 0.7);
+    this.friction = friction || 0.7;
   }
 
   update(width, height) {
     this.vel.add(this.acc);
-    this.vel.multiply(this.friction);
+    this.vel.multS(this.friction);
     this.pos.add(this.vel);
 
     if (this.pos.x > width) {
@@ -58,7 +58,8 @@ export default class Point {
 
     if (field[i] && field[i][j]) {
       const f = field[i][j] * Math.PI;
-      this.acc.setAxes(Math.sin(f) / 40, Math.cos(f) / 40);
+      this.acc.x = Math.sin(f) / 40;
+      this.acc.y = Math.cos(f) / 40;
     }
   }
 }

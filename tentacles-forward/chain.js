@@ -1,4 +1,4 @@
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 import SimplexNoise from 'simplex-noise';
 
 const noise = new SimplexNoise();
@@ -35,7 +35,7 @@ export class Segment {
     this.t += this.dt;
     // const min = -Math.PI / 2;
     // const max = Math.PI / 2;
-    this.selfAngle = noise.noise2D(this.t, 200) % Math.PI;
+    this.selfAngle = noise.noise2D(this.t, 200);
   }
 
   update(position, angle) {
@@ -44,15 +44,7 @@ export class Segment {
       this.position = position;
     }
     this.angle = this.selfAngle + (angle || 0);
-    const start = this.position;
-    const end = new Vector()
-      .copy(start)
-      .add(
-        new Vector(
-          this.offset * Math.cos(this.angle),
-          this.offset * Math.sin(this.angle)
-        )
-      );
+    const end = Vector.polar(this.angle, this.offset).add(this.position);
 
     if (this.child) {
       this.child.update(end, this.angle);

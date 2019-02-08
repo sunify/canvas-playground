@@ -1,6 +1,6 @@
 import runWithFps from 'run-with-fps';
 import Point, { distFast } from './point';
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 import lerp from '@sunify/lerp-color';
 import eases from 'eases';
 import tweeen from 'tweeen';
@@ -60,10 +60,14 @@ const draw = () => {
     );
     ctx.lineWidth = PIXEL_RATIO;
     p.update();
-    const dx = (Math.cos(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
-    const dy = (Math.sin(p.vel.angle()) * p.vel.length() * 2) / PIXEL_RATIO;
+    const trace = p.vel
+      .clone()
+      .multS(2)
+      .divS(PIXEL_RATIO)
+      .add(p.pos);
+
     ctx.beginPath();
-    ctx.moveTo(p.pos.x + dx, p.pos.y + dy);
+    ctx.moveTo(trace.x, trace.y);
     ctx.lineTo(p.pos.x, p.pos.y);
     ctx.stroke();
   });
@@ -83,13 +87,13 @@ const emitParticles = (x, y) => {
     );
 
     for (let i = 0; i < 15; i += 1) {
-      const angle = baseAngle + (Math.PI / 1.7) * (0.5 - Math.random()); // spread particles a little
+      const angle = baseAngle + (Math.PI / 1.4) * (0.5 - Math.random()); // spread particles a little
       const len = Math.max(-40, -10 * (baseLen / 3)) * Math.random();
       points.push([
         new Point(
-          new Vector(canvasValue(x), canvasValue(y)),
-          new Vector(len * Math.cos(angle), len * Math.sin(angle)),
-          new Vector(-0.1 * Math.cos(angle), -0.1 * Math.sin(angle))
+          Vector.cartesian(canvasValue(x), canvasValue(y)),
+          Vector.polar(angle, len),
+          Vector.polar(angle, len * 0.05)
         ),
         Date.now() + 100 * Math.random(),
         angle
@@ -136,9 +140,9 @@ const fireworks = (x, y) => {
     const len = 30 + 120 * Math.random() * PIXEL_RATIO;
     points.push([
       new Point(
-        new Vector(x, y),
-        new Vector(len * Math.cos(angle), len * Math.sin(angle)),
-        new Vector(0.7 * Math.cos(angle), 0.5)
+        Vector.cartesian(x, y),
+        Vector.polar(angle, len),
+        Vector.cartesian(0.7 * Math.cos(angle), 0.5)
       ),
       Date.now() + Math.random() * 1000,
       angle

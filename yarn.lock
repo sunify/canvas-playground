@@ -4462,6 +4462,10 @@ util@^0.11.0:
   dependencies:
     inherits "2.0.3"
 
+v-for-vector@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/v-for-vector/-/v-for-vector-1.1.0.tgz#87c2ca4e3084ed65e02187c22a9799bf5ba72388"
+
 v8-compile-cache@^2.0.0:
   version "2.0.2"
   resolved "https://registry.yarnpkg.com/v8-compile-cache/-/v8-compile-cache-2.0.2.tgz#a428b28bb26790734c4fc8bc9fa106fccebf6a6c"
@@ -4469,10 +4473,6 @@ v8-compile-cache@^2.0.0:
 vendors@^1.0.0:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/vendors/-/vendors-1.0.2.tgz#7fcb5eef9f5623b156bcea89ec37d63676f21801"
-
-victor@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/victor/-/victor-1.1.0.tgz#de3cc77b15589b1b0c7b22c3dad297034ab002ba"
 
 vlq@^0.2.2:
   version "0.2.3"

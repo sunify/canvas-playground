@@ -1,7 +1,7 @@
 import runWithFps from 'run-with-fps';
 import SimplexNoise from 'simplex-noise';
 import Point from './point';
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 import lerp from '@sunify/lerp-color';
 
 // const lerp = memoize(lerpColor);

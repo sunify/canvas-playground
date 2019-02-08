@@ -1,4 +1,4 @@
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 import SimplexNoise from 'simplex-noise';
 
 const noise = new SimplexNoise();
@@ -12,7 +12,7 @@ export class Segment {
       this.parent = null;
     } else {
       this.parent = posOrParent;
-      this.position = new Vector().copy(this.parent.end);
+      this.position = this.parent.end.clone();
       posOrParent.child = this;
     }
     this.offset = offset;
@@ -40,31 +40,17 @@ export class Segment {
 
   get end() {
     if (this.position) {
-      const start = this.position;
-      return new Vector()
-        .copy(start)
-        .add(
-          new Vector(
-            this.offset * Math.cos(this.angle),
-            this.offset * Math.sin(this.angle)
-          )
-        );
+      return Vector.polar(this.angle, this.offset).add(this.position);
     }
 
     return null;
   }
 
   follow(target) {
-    const dirAngle = Math.atan2(
-      target.y - this.position.y,
-      target.x - this.position.x
-    );
+    const dir = target.clone().sub(this.position);
     this.wiggle();
-    this.angle = dirAngle + this.selfAngle;
-    this.position = new Vector(
-      -this.offset * Math.cos(dirAngle) + target.x,
-      -this.offset * Math.sin(dirAngle) + target.y
-    );
+    this.angle = dir.angle + this.selfAngle;
+    this.position = dir.setMagnitude(-this.offset).add(target);
 
     if (this.parent) {
       this.parent.follow(this.position);

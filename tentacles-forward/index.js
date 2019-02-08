@@ -1,6 +1,6 @@
 import runWithFPS from 'run-with-fps';
 import eases from 'eases';
-import Vector from 'victor';
+import { Vector } from 'v-for-vector';
 import { Segment } from './chain';
 
 const canvas = document.getElementById('canvas');
@@ -14,13 +14,11 @@ canvas.height = height * PIXEL_RATIO;
 const segs = [];
 const count = 8;
 const size = 30;
+const center = Vector.cartesian(width / 2, height / 2);
 for (let j = 0; j < count; j += 1) {
   const baseAngle = ((Math.PI * 2) / count) * j;
   const root = new Segment(
-    new Vector(
-      65 * Math.cos(baseAngle) + width / 2,
-      65 * Math.sin(baseAngle) + height / 2
-    ),
+    Vector.polar(baseAngle, 65).add(center),
     10,
     baseAngle
   );
