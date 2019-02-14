@@ -38,9 +38,6 @@ html {
 }
 
 body {
-  font-family: 'Work Sans';
-  font-weight: 300;
-  color: #ffffff;
   background-color: #000;
   height: 100%;
 }
@@ -54,10 +51,20 @@ body {
   position: absolute;
 }
 
+@keyframes swap {
+  0% {
+    transform: translate(-50%, -50%) rotate(0deg);
+  }
+
+  100% {
+    transform: translate(-50%, -50%) rotate(360deg);
+  }
+}
+
 .bg {
   position: absolute;
   display: block;
   top: 50%;
   left: 50%;
-  transform: translate(-50%, -50%);
+  animation: swap 140s linear infinite;
 }

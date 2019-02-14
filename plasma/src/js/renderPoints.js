@@ -27,16 +27,20 @@ function memlerp(colors, steps = 10) {
 
 const flowerColors = memlerp(
   [
-    `rgba(#A0F, 0.02)`,
-    `rgba(#33a, 0.1)`,
-    `rgba(#AAF, 0.2)`,
-    `rgba(#0FE, 0.02)`,
+    `rgba(#A0F, 0.01)`,
+    `rgba(#33a, 0.03)`,
+    `rgba(#AAF, 0.03)`,
+    `rgba(#0FE, 0.01)`,
     `rgba(#000, 0)`
   ],
   30
 );
 
 export default function renderPoints(points, ctx, width, height) {
+  if (Math.round(Date.now() / 100) % 100 === 0) {
+    ctx.fillStyle = 'rgba(0, 0, 0, 0.08)';
+    ctx.fillRect(0, 0, width * PIXEL_RATIO, height * PIXEL_RATIO);
+  }
   voronoi.recycle(diagram);
   const boxPad = 1000;
   const bbox = {
@@ -49,9 +53,10 @@ export default function renderPoints(points, ctx, width, height) {
 
   points.forEach(p => {
     const age = Date.now() - p.time;
-    ctx.fillStyle = `rgba(255, 255, 255, ${eases.quartIn(age / 10000) / 3})`;
+    ctx.fillStyle = `rgba(255, 255, 255, ${eases.quartIn(age / 10000) / 50})`;
     ctx.fillRect(p.pos.x * PIXEL_RATIO, p.pos.y * PIXEL_RATIO, 1, 1);
-    ctx.fillStyle = `rgba(255, 255, 255, ${eases.quadIn(1 - age / 10000) / 3})`;
+    ctx.fillStyle = `rgba(255, 255, 255, ${eases.quadIn(1 - age / 10000) /
+      15})`;
     ctx.fillRect(p.pos.x * PIXEL_RATIO, p.pos.y * PIXEL_RATIO, 1, 1);
   });
 
@@ -60,7 +65,7 @@ export default function renderPoints(points, ctx, width, height) {
     const d = dst2(va, vb);
     ctx.beginPath();
     ctx.lineWidth = 1;
-    ctx.strokeStyle = flowerColors(eases.circOut(Math.min(1, d / 1600)));
+    ctx.strokeStyle = flowerColors(eases.circOut(Math.min(1, d / 6000)));
     ctx.moveTo(va.x * PIXEL_RATIO, va.y * PIXEL_RATIO);
     ctx.lineTo(vb.x * PIXEL_RATIO, vb.y * PIXEL_RATIO);
     ctx.stroke();

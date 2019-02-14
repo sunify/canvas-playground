@@ -79,7 +79,7 @@ const stop = [
         Vector.polar(angle, 0.1)
       )
     );
-  }, 20)
+  }, 10)
 ];
 
 stop.push(runWithFps(draw, 30));
