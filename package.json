@@ -11,7 +11,8 @@
     "run-with-fps": "^1.0.4",
     "simplex-noise": "^2.4.0",
     "tweeen": "^1.0.5",
-    "v-for-vector": "1.1.0"
+    "v-for-vector": "1.1.0",
+    "voronoi": "^1.0.0"
   },
   "devDependencies": {
     "parcel-bundler": "^1.11.0"
