@@ -25,7 +25,7 @@ export default class Point {
   }
 
   update(width, height) {
-    this.acc.angle += 0.006 * this.direction;
+    this.acc.angle += 0.0065 * this.direction;
     this.vel.add(this.acc).mult(this.friction);
     this.pos.add(this.vel);
   }

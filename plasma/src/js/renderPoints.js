@@ -47,11 +47,11 @@ export default function renderPoints(points, ctx, width, height) {
   };
   diagram = voronoi.compute(points, bbox);
 
-  const sine = t => Math.sin((0.5 - t) * Math.PI * 2);
-
   points.forEach(p => {
     const age = Date.now() - p.time;
-    ctx.fillStyle = `rgba(255, 255, 255, ${sine(age / 10000) / 2})`;
+    ctx.fillStyle = `rgba(255, 255, 255, ${eases.quartIn(age / 10000) / 3})`;
+    ctx.fillRect(p.pos.x * PIXEL_RATIO, p.pos.y * PIXEL_RATIO, 1, 1);
+    ctx.fillStyle = `rgba(255, 255, 255, ${eases.quadIn(1 - age / 10000) / 3})`;
     ctx.fillRect(p.pos.x * PIXEL_RATIO, p.pos.y * PIXEL_RATIO, 1, 1);
   });
 

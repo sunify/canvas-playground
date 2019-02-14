@@ -74,7 +74,7 @@ const stop = [
     const angle = Math.PI * 2 * Math.random();
     points.push(
       new Point(
-        Vector.polar(angle, 0).add(center),
+        Vector.polar(angle, 10).add(center),
         Vector.polar(angle, 0 * Math.random()),
         Vector.polar(angle, 0.1)
       )
