@@ -47,7 +47,7 @@ a:hover {
 
 h1 {
   font-weight: 200;
-  font-size: 70px;
+  font-size: 30px;
 
   text-transform: uppercase;
   letter-spacing: 2px;
@@ -56,7 +56,7 @@ h1 {
 }
 
 h1 a {
-  background-size: 100% 10px;
+  background-size: 100% 3px;
 }
 
 ul {
@@ -88,4 +88,13 @@ ul li:hover .github-link {
 
 .github-link:hover {
   color: #ffffff;
+}
+
+@media screen and (min-width: 700px) {
+  h1 {
+    font-size: 70px;
+  }
+  h1 a {
+    background-size: 100% 10px;
+  }
 }
