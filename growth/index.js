@@ -1,0 +1,218 @@
+import runWithFps from 'run-with-fps';
+import { Vector } from 'v-for-vector';
+import eases from 'eases';
+import { canvas, ctx, PIXEL_RATIO, width, height } from './setup';
+
+class DiffLine {
+  constructor(
+    maxForce,
+    maxSpeed,
+    desiredSeparation,
+    separationCohesionRation,
+    maxEdgeLen
+  ) {
+    this.maxForce = maxForce;
+    this.maxSpeed = maxSpeed;
+    this.desiredSeparation = desiredSeparation;
+    this.sq_desiredSeparation = desiredSeparation ** 2;
+    this.separationCohesionRation = separationCohesionRation;
+    this.maxEdgeLen = maxEdgeLen;
+    this.nodes = [];
+  }
+
+  addNode(node) {
+    this.nodes.push(node);
+  }
+
+  addNodeAt(node, index) {
+    this.nodes.splice(index, 0, node);
+  }
+
+  update() {
+    this.differentiate();
+    this.growth();
+  }
+
+  growth() {
+    for (let i = 0; i < this.nodes.length - 1; i += 1) {
+      const n1 = this.nodes[i];
+      const n2 = this.nodes[i + 1];
+      const d = Vector.dist(n1.position, n2.position);
+      if (d > this.maxEdgeLen) {
+        // Can add more rules for inserting nodes
+        const index = this.nodes.indexOf(n2);
+        const middleNode = Vector.clone(n1.position)
+          .add(n2.position)
+          .div(2);
+        this.addNodeAt(
+          new Node(middleNode, this.maxForce, this.maxSpeed),
+          index
+        );
+      }
+    }
+  }
+
+  differentiate() {
+    const separationForces = this.getSeparationForces();
+    const cohesionForces = this.getEdgeCohesionForces();
+    for (let i = 0; i < this.nodes.length; i += 1) {
+      const separation = separationForces[i];
+      const cohesion = cohesionForces[i];
+      separation.mult(this.separationCohesionRation);
+      this.nodes[i].applyForce(separation);
+      this.nodes[i].applyForce(cohesion);
+      this.nodes[i].update();
+    }
+  }
+
+  getSeparationForces() {
+    const n = this.nodes.length;
+    const separateForces = [];
+    const nearNodes = [];
+    let nodei;
+    let nodej;
+
+    for (let i = 0; i < n; i += 1) {
+      separateForces.push(new Vector(0, 0));
+    }
+
+    for (let i = 0; i < n; i += 1) {
+      nodei = this.nodes[i];
+      for (let j = i + 1; j < n; j += 1) {
+        nodej = this.nodes[j];
+        const forceij = this.getSeparationForce(nodei, nodej);
+        if (forceij.magnitude > 0) {
+          separateForces[i].add(forceij);
+          separateForces[j].sub(forceij);
+          nearNodes[i] = (nearNodes[i] || 0) + 1;
+          nearNodes[j] = (nearNodes[j] || 0) + 1;
+        }
+      }
+      if (nearNodes[i] > 0) {
+        separateForces[i].div(nearNodes[i]);
+      }
+      if (separateForces[i].magnitude > 0) {
+        separateForces[i]
+          .setMagnitude(this.maxSpeed)
+          .sub(this.nodes[i].velocity)
+          .limit(this.maxForce);
+      }
+    }
+    return separateForces;
+  }
+
+  getSeparationForce(n1, n2) {
+    const steer = new Vector(0, 0);
+    const sq_d =
+      (n2.position.x - n1.position.x) ** 2 +
+      (n2.position.y - n1.position.y) ** 2;
+    if (sq_d > 0 && sq_d < this.sq_desiredSeparation) {
+      const diff = Vector.clone(n1.position).sub(n2.position);
+      diff.normalize();
+      diff.div(Math.sqrt(sq_d)); // Weight by distacne
+      steer.add(diff);
+    }
+    return steer;
+  }
+
+  getEdgeCohesionForces() {
+    const cohesionForces = [];
+    for (let i = 0; i < this.nodes.length; i++) {
+      const sum = new Vector(0, 0);
+      if (i !== 0 && i !== this.nodes.length - 1) {
+        sum.add(this.nodes[i - 1].position).add(this.nodes[i + 1].position);
+      } else if (i === 0) {
+        sum
+          .add(this.nodes[this.nodes.length - 1].position)
+          .add(this.nodes[i + 1].position);
+      } else if (i === this.nodes.length - 1) {
+        sum.add(this.nodes[i - 1].position).add(this.nodes[0].position);
+      }
+      sum.div(2);
+      cohesionForces.push(this.nodes[i].seek(sum));
+    }
+    return cohesionForces;
+  }
+}
+
+class Node {
+  constructor(position, maxForce, maxSpeed) {
+    this.position = position;
+    this.maxForce = maxForce;
+    this.maxSpeed = maxSpeed;
+    this.acceleration = new Vector(0, 0);
+    this.velocity = Vector.random().mult(Math.random());
+  }
+
+  applyForce(force) {
+    // debugger;
+    this.acceleration.add(force);
+  }
+
+  update() {
+    this.velocity.add(this.acceleration).limit(this.maxSpeed);
+    this.position.add(this.velocity);
+    this.acceleration.mult(0);
+  }
+
+  seek(target) {
+    return Vector.clone(target)
+      .sub(this.position)
+      .setMagnitude(this.maxSpeed)
+      .sub(this.velocity)
+      .limit(this.maxForce);
+  }
+}
+
+const line = new DiffLine(0.2, 2, 20, 0.95, 8);
+const center = Vector.cartesian(width / 2, height / 2);
+const START_LENGTH = 20;
+for (let i = 0; i <= START_LENGTH; i += 1) {
+  const angle = ((Math.PI * 2) / START_LENGTH) * i;
+  line.addNode(
+    new Node(
+      Vector.polar(angle, Math.cos(Math.random() / 3) * 200).add(center),
+      line.maxForce,
+      line.maxSpeed
+    )
+  );
+}
+
+const MAX_LEN = 7000;
+const draw = () => {
+  // canvas.width = canvas.width;
+  line.update();
+  const progress = line.nodes.length / MAX_LEN;
+  const h = 130 + 80 * eases.quadIn(progress);
+  const s = 80 - 25 * eases.expoOut(1 - progress);
+  const l = 70 - 55 * eases.expoOut(1 - progress);
+  const a = progress + 0.6;
+  ctx.strokeStyle = `hsla(${h},${s}%,${l}%,${a})`;
+  ctx.lineWidth = 2 + 4 * (1 - progress);
+  ctx.beginPath();
+  for (let i = 0; i < line.nodes.length; i += 1) {
+    const node = line.nodes[i];
+    if (i === 0) {
+      ctx.moveTo(node.position.x * PIXEL_RATIO, node.position.y * PIXEL_RATIO);
+    } else {
+      ctx.lineTo(node.position.x * PIXEL_RATIO, node.position.y * PIXEL_RATIO);
+    }
+  }
+  ctx.stroke();
+
+  if (line.nodes.length > MAX_LEN) {
+    stop();
+  }
+};
+
+const stop = runWithFps(draw, 60);
+
+// Handle hot module replacement
+if (module.hot) {
+  module.hot.dispose(() => {
+    if (stop) {
+      canvas.width = canvas.width;
+      stop();
+    }
+  });
+}
