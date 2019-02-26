@@ -73,7 +73,7 @@ class DiffLine {
     let nodej;
 
     for (let i = 0; i < n; i += 1) {
-      separateForces.push(new Vector(0, 0));
+      separateForces.push(Vector.zero());
     }
 
     for (let i = 0; i < n; i += 1) {
@@ -102,15 +102,13 @@ class DiffLine {
   }
 
   getSeparationForce(n1, n2) {
-    const steer = new Vector(0, 0);
-    const sq_d =
-      (n2.position.x - n1.position.x) ** 2 +
-      (n2.position.y - n1.position.y) ** 2;
+    const steer = Vector.zero();
+    const dx = n1.position.x - n2.position.x;
+    const dy = n1.position.y - n2.position.y;
+    const sq_d = dx ** 2 + dy ** 2;
     if (sq_d > 0 && sq_d < this.sq_desiredSeparation) {
-      const diff = Vector.clone(n1.position).sub(n2.position);
-      diff.normalize();
-      diff.div(Math.sqrt(sq_d)); // Weight by distacne
-      steer.add(diff);
+      const angle = Math.atan2(dy, dx);
+      steer.add(Vector.polar(angle, 1 / Math.sqrt(sq_d)));
     }
     return steer;
   }
@@ -118,7 +116,7 @@ class DiffLine {
   getEdgeCohesionForces() {
     const cohesionForces = [];
     for (let i = 0; i < this.nodes.length; i++) {
-      const sum = new Vector(0, 0);
+      const sum = Vector.zero();
       if (i !== 0 && i !== this.nodes.length - 1) {
         sum.add(this.nodes[i - 1].position).add(this.nodes[i + 1].position);
       } else if (i === 0) {
@@ -140,19 +138,16 @@ class Node {
     this.position = position;
     this.maxForce = maxForce;
     this.maxSpeed = maxSpeed;
-    this.acceleration = new Vector(0, 0);
-    this.velocity = Vector.random().mult(Math.random());
+    this.velocity = Vector.random();
   }
 
   applyForce(force) {
-    // debugger;
-    this.acceleration.add(force);
+    this.velocity.add(force);
   }
 
   update() {
-    this.velocity.add(this.acceleration).limit(this.maxSpeed);
+    this.velocity.limit(this.maxSpeed);
     this.position.add(this.velocity);
-    this.acceleration.mult(0);
   }
 
   seek(target) {
@@ -164,31 +159,31 @@ class Node {
   }
 }
 
-const line = new DiffLine(0.2, 2, 20, 0.95, 8);
+const line = new DiffLine(0.2, 2, 50, 0.95, 15);
 const center = Vector.cartesian(width / 2, height / 2);
 const START_LENGTH = 20;
 for (let i = 0; i <= START_LENGTH; i += 1) {
   const angle = ((Math.PI * 2) / START_LENGTH) * i;
   line.addNode(
     new Node(
-      Vector.polar(angle, Math.cos(Math.random() / 3) * 200).add(center),
+      Vector.polar(angle, 100 * Math.random()).add(center),
       line.maxForce,
       line.maxSpeed
     )
   );
 }
 
-const MAX_LEN = 7000;
+const MAX_LEN = 2000;
 const draw = () => {
-  // canvas.width = canvas.width;
+  canvas.width = canvas.width;
   line.update();
   const progress = line.nodes.length / MAX_LEN;
-  const h = 130 + 80 * eases.quadIn(progress);
-  const s = 80 - 25 * eases.expoOut(1 - progress);
-  const l = 70 - 55 * eases.expoOut(1 - progress);
-  const a = progress + 0.6;
+  const h = 20 + 80 * eases.expoOut(progress);
+  const s = 50 + 40 * eases.backIn(progress);
+  const l = 50 + 40 * eases.backIn(progress);
+  const a = progress + 0.7;
   ctx.strokeStyle = `hsla(${h},${s}%,${l}%,${a})`;
-  ctx.lineWidth = 2 + 4 * (1 - progress);
+  ctx.lineWidth = 5 + 4 * (1 - progress);
   ctx.beginPath();
   for (let i = 0; i < line.nodes.length; i += 1) {
     const node = line.nodes[i];
