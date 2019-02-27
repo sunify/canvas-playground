@@ -1,6 +1,7 @@
 import runWithFps from 'run-with-fps';
 import * as dat from 'dat.gui';
 import eases from 'eases';
+import tweeen from 'tweeen';
 import lerp from '@sunify/lerp-color';
 import {
   canvas,
@@ -24,8 +25,27 @@ const params = {
     downloadCanvas(`${params.shape}-${Date.now()}`);
   },
   refreshPalette() {
+    const prevColors = [...colorsArr];
     colorsArr = shuffle(colorsArr);
-    colors = lerp(...colorsArr, ...colorsArr);
+
+    if (this.prevTween) {
+      this.prevTween();
+    }
+
+    this.prevTween = tweeen(
+      0,
+      1,
+      progress => {
+        const curColors = prevColors.map((prevC, i) =>
+          lerp(prevC, colorsArr[i], progress)
+        );
+        colors = lerp(...curColors, ...curColors);
+      },
+      {
+        duration: 500,
+        easing: eases.quadInOut
+      }
+    );
   }
 };
 const gui = new dat.GUI();
