@@ -14,7 +14,7 @@ import {
 import SimplexNoise from 'simplex-noise';
 
 const params = {
-  noiseFrequncy: 100,
+  noiseFrequncy: 5,
   noiseAmplitude: 0.3,
   speed: 0.1,
   colorSpeed: 0.1,
@@ -49,7 +49,7 @@ const params = {
   }
 };
 const gui = new dat.GUI();
-gui.add(params, 'noiseFrequncy', 0, 200);
+gui.add(params, 'noiseFrequncy', 0, 10);
 gui.add(params, 'noiseAmplitude', 0, 10);
 gui.add(params, 'speed', 0, 1);
 gui.add(params, 'stroke');
@@ -179,9 +179,9 @@ const draw = () => {
     for (let i = 0; i <= SEGMENTS; i += 1) {
       const angle = ((Math.PI * 2) / SEGMENTS) * i;
       const xoff =
-        ((Math.cos(angle - t / 1) + 1) / 2) * 2 * params.noiseFrequncy;
+        ((Math.cos(angle - t / 1) + 1) / 2) * 2 * params.noiseFrequncy * 20;
       const yoff =
-        ((Math.sin(angle + t / 2) + 1) / 2) * 2 * params.noiseFrequncy;
+        ((Math.sin(angle + t / 2) + 1) / 2) * 2 * params.noiseFrequncy * 20;
       const n = (noise.noise2D(xoff, yoff) + 1) * params.noiseAmplitude;
 
       const shape = {
