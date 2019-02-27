@@ -1,8 +1,43 @@
 import runWithFps from 'run-with-fps';
+import * as dat from 'dat.gui';
 import eases from 'eases';
 import lerp from '@sunify/lerp-color';
-import { canvas, ctx, width, height, PIXEL_RATIO } from './setup';
+import {
+  canvas,
+  ctx,
+  width,
+  height,
+  PIXEL_RATIO,
+  downloadCanvas
+} from './setup';
 import SimplexNoise from 'simplex-noise';
+
+const params = {
+  noiseFrequncy: 100,
+  noiseAmplitude: 0.3,
+  speed: 0.1,
+  colorSpeed: 0.1,
+  strokeWeight: 0.5,
+  stroke: false,
+  shape: 'heart',
+  save() {
+    downloadCanvas(`${params.shape}-${Date.now()}`);
+  },
+  refreshPalette() {
+    colorsArr = shuffle(colorsArr);
+    colors = lerp(...colorsArr, ...colorsArr);
+  }
+};
+const gui = new dat.GUI();
+gui.add(params, 'noiseFrequncy', 0, 200);
+gui.add(params, 'noiseAmplitude', 0, 10);
+gui.add(params, 'speed', 0, 1);
+gui.add(params, 'stroke');
+gui.add(params, 'strokeWeight', 0, 4);
+gui.add(params, 'colorSpeed', 0, 1);
+gui.add(params, 'shape', ['circle', 'heart']);
+gui.add(params, 'refreshPalette');
+gui.add(params, 'save');
 
 function shuffle(a) {
   var j, x, i;
@@ -26,8 +61,7 @@ export let colors = lerp(...colorsArr, ...colorsArr);
 
 document.addEventListener('keydown', e => {
   if (e.keyCode === 32) {
-    colorsArr = shuffle(colorsArr);
-    colors = lerp(...colorsArr, ...colorsArr);
+    params.refreshPalette();
   }
 });
 
@@ -65,6 +99,34 @@ const noiseCtx = noiseCanvas.getContext('2d');
 noiseCanvas.width = 200;
 noiseCanvas.height = 200;
 
+function heartCoords(angle, n, progress) {
+  const scale = 2 + Math.abs(Math.sin(t2 * 60)) * 0 + n * params.noiseAmplitude;
+  const x =
+    (16 * scale * (1 - progress) * Math.sin(angle) ** 3 + 25) * 15 -
+    350 +
+    (width * PIXEL_RATIO) / 2;
+
+  const y =
+    (13 * scale * (1 - progress) * Math.cos(angle) -
+      5 * scale * Math.cos(angle * 2) -
+      2 * scale * Math.cos(3 * angle) -
+      Math.cos(4 * angle) +
+      20) *
+      -15 +
+    300 +
+    (height * PIXEL_RATIO) / 2;
+
+  return [x, y];
+}
+
+function circleCoords(angle, n, progress) {
+  const r = (1000 * (1 - progress) + n * 20) / 2;
+  const x = r * Math.cos(angle) + (width * PIXEL_RATIO) / 2;
+  const y = r * Math.sin(angle) + (height * PIXEL_RATIO) / 2;
+
+  return [x, y];
+}
+
 let t = 0;
 let t2 = 0;
 let progressOffset = 0;
@@ -80,8 +142,8 @@ const draw = () => {
   noiseCtx.fillRect(0, 0, noiseCanvas.width, noiseCanvas.height);
   noisifyCanvas(noiseCtx, 60);
 
-  t2 += 0.001;
-  progressOffset += 0.006;
+  t2 += params.speed / 100;
+  progressOffset += params.colorSpeed / 10;
   t = t2;
   for (let j = 0; j < ITER_COUNT; j += 1) {
     t += 0.01;
@@ -89,28 +151,18 @@ const draw = () => {
     const progress = j / ITER_COUNT;
     for (let i = 0; i <= SEGMENTS; i += 1) {
       const angle = ((Math.PI * 2) / SEGMENTS) * i;
-      const xoff = ((Math.cos(angle - t / 1) + 1) / 2) * 2 * 10;
-      const yoff = ((Math.sin(angle + t / 2) + 1) / 2) * 2 * 10;
-      const n = (noise.noise2D(xoff, yoff) + 1) / 2;
-      const r = (1000 * (1 - progress) + n * 20) / 2;
+      const xoff =
+        ((Math.cos(angle - t / 1) + 1) / 2) * 2 * params.noiseFrequncy;
+      const yoff =
+        ((Math.sin(angle + t / 2) + 1) / 2) * 2 * params.noiseFrequncy;
+      const n = (noise.noise2D(xoff, yoff) + 1) * params.noiseAmplitude;
 
-      const scale = 2 + Math.abs(Math.sin(t2 * 60)) * 0 + n / 8;
-      const x =
-        (16 * scale * (1 - progress) * Math.sin(angle) ** 3 + 25) * 15 -
-        350 +
-        (width * PIXEL_RATIO) / 2;
+      const shape = {
+        circle: circleCoords,
+        heart: heartCoords
+      }[params.shape];
+      const [x, y] = shape(angle, n, progress);
 
-      const y =
-        (13 * scale * (1 - progress) * Math.cos(angle) -
-          5 * scale * Math.cos(angle * 2) -
-          2 * scale * Math.cos(3 * angle) -
-          Math.cos(4 * angle) +
-          20) *
-          -15 +
-        300 +
-        (height * PIXEL_RATIO) / 2;
-      // const x = r * Math.cos(angle) + (width * PIXEL_RATIO) / 2;
-      // const y = r * Math.sin(angle) + (height * PIXEL_RATIO) / 2;
       if (i === 0) {
         ctx.moveTo(x, y);
       } else {
@@ -131,8 +183,10 @@ const draw = () => {
       ctx.shadowColor = 'transparent';
     }
     ctx.fill();
-    ctx.lineWidth = 0.5;
-    // ctx.stroke();
+    ctx.lineWidth = params.strokeWeight;
+    if (params.stroke) {
+      ctx.stroke();
+    }
   }
   ctx.globalCompositeOperation = 'lighter';
 
@@ -149,6 +203,10 @@ const stop = runWithFps(draw, 14);
 if (module.hot) {
   module.hot.dispose(() => {
     if (stop) {
+      const dgRoot = document.querySelector('body > .dg');
+      if (dgRoot) {
+        dgRoot.removeChild(dgRoot.querySelector('.dg.main'));
+      }
       canvas.width = canvas.width;
       stop();
     }

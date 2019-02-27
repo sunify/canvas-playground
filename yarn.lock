@@ -1515,6 +1515,10 @@ csso@~2.3.1:
     clap "^1.0.9"
     source-map "^0.5.3"
 
+dat.gui@^0.7.5:
+  version "0.7.5"
+  resolved "https://registry.yarnpkg.com/dat.gui/-/dat.gui-0.7.5.tgz#ab155825b0db88729c025697ef60c97fb87bef85"
+
 date-now@^0.1.4:
   version "0.1.4"
   resolved "https://registry.yarnpkg.com/date-now/-/date-now-0.1.4.tgz#eaf439fd4d4848ad74e5cc7dbef200672b9e345b"
