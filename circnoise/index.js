@@ -59,6 +59,10 @@ gui.add(params, 'shape', ['circle', 'heart']);
 gui.add(params, 'refreshPalette');
 gui.add(params, 'save');
 
+canvas.addEventListener('touchend', e => {
+  params.refreshPalette();
+});
+
 function shuffle(a) {
   var j, x, i;
   for (i = a.length - 1; i > 0; i--) {
@@ -120,10 +124,13 @@ noiseCanvas.width = 200;
 noiseCanvas.height = 200;
 
 function heartCoords(angle, n, progress) {
-  const scale = 2 + Math.abs(Math.sin(t2 * 60)) * 0 + n * params.noiseAmplitude;
+  const scale =
+    Math.min(width, height) / 500 +
+    Math.abs(Math.sin(t2 * 60)) * 0 +
+    n * params.noiseAmplitude;
   const x =
     (16 * scale * (1 - progress) * Math.sin(angle) ** 3 + 25) * 15 -
-    350 +
+    370 +
     (width * PIXEL_RATIO) / 2;
 
   const y =
@@ -140,7 +147,7 @@ function heartCoords(angle, n, progress) {
 }
 
 function circleCoords(angle, n, progress) {
-  const r = (1000 * (1 - progress) + n * 20) / 2;
+  const r = (Math.min(height, width) * (1 - progress) + n * 20) / 2;
   const x = r * Math.cos(angle) + (width * PIXEL_RATIO) / 2;
   const y = r * Math.sin(angle) + (height * PIXEL_RATIO) / 2;
 
