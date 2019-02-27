@@ -37,12 +37,12 @@ const params = {
       1,
       progress => {
         const curColors = prevColors.map((prevC, i) =>
-          lerp(prevC, colorsArr[i], progress)
+          lerp(prevC, '#FFF', colorsArr[i], progress)
         );
         colors = lerp(...curColors, ...curColors);
       },
       {
-        duration: 500,
+        duration: 300,
         easing: eases.quadInOut
       }
     );
