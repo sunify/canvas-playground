@@ -17,6 +17,16 @@ export const { innerWidth: width, innerHeight: height } = window;
 export const canvas = document.getElementById('bg');
 export const ctx = canvas.getContext('2d');
 
+document.addEventListener('keyup', e => {
+  if (e.keyCode === 83 && e.ctrlKey) {
+    e.preventDefault();
+
+    canvas.toBlob(blob => {
+      window.open(URL.createObjectURL(blob));
+    }, 'image/png');
+  }
+});
+
 canvas.width = width * PIXEL_RATIO;
 canvas.height = height * PIXEL_RATIO;
 canvas.style.width = width + 'px';
