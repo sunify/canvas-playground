@@ -54,7 +54,7 @@ export const params = {
 };
 export const gui = new dat.GUI();
 gui.add(params, 'shape', ['circle', 'heart']);
-gui.add(params, 'palette', { Default: 0, Palette1: 1 }).onChange(() => {
+gui.add(params, 'palette', { Default: 0, "Majora's mask": 1 }).onChange(() => {
   params.refreshPalette();
 });
 gui.add(params, 'segments', 3, 150);

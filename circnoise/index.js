@@ -84,10 +84,10 @@ const stop = runWithFps(draw, 14);
 if (module.hot) {
   module.hot.dispose(() => {
     if (stop) {
-      const dgRoot = document.querySelector('body > .dg');
-      if (dgRoot) {
-        dgRoot.removeChild(dgRoot.querySelector('.dg.main'));
-      }
+      // const dgRoot = document.querySelector('body > .dg');
+      // if (dgRoot) {
+      //   dgRoot.removeChild(dgRoot.querySelector('.dg.main'));
+      // }
       canvas.width = canvas.width;
       stop();
     }
