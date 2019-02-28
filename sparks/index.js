@@ -44,26 +44,26 @@ const drawLine = path => {
 
 let points = [];
 
+const ttl = 400;
 const draw = () => {
   canvas.width = canvas.width;
   if (mouseMoving) {
   }
 
-  const ttl = 1300;
   points = points.filter(([_, t]) => Date.now() - t < ttl);
   points.forEach(([p, t]) => {
-    const age = (Date.now() - t) / ttl;
-    ctx.strokeStyle = lerp(
-      `rgba(255, 255, 120, 1)`,
-      `rgba(255, 25, 0, 0.3)`,
-      eases.quartInOut(age)
-    );
+    const age = eases.bounceInOut((Date.now() - t) / ttl);
+    // ctx.strokeStyle = lerp(
+    //   `rgba(255, 255, 120, 1)`,
+    //   `rgba(255, 25, 0, 0.3)`,
+    //   eases.bounceInOut(age)
+    // );
+    ctx.strokeStyle = `hsla(${50 + 10 * age}, 100%, ${70}%, ${1 - age})`;
     ctx.lineWidth = PIXEL_RATIO;
     p.update();
     const trace = p.vel
       .clone()
-      .mult(2)
-      .divS(PIXEL_RATIO)
+      .mult(2 / PIXEL_RATIO)
       .add(p.pos);
 
     ctx.beginPath();
@@ -93,9 +93,9 @@ const emitParticles = (x, y) => {
         new Point(
           Vector.cartesian(canvasValue(x), canvasValue(y)),
           Vector.polar(angle, len),
-          Vector.polar(angle, len * 0.05)
+          Vector.polar(angle, len * 0.1 * Math.random())
         ),
-        Date.now() + 100 * Math.random(),
+        Date.now() + ttl * Math.random(),
         angle
       ]);
     }
@@ -107,9 +107,9 @@ let mouseTrack = [];
 let trackClearanceTimeout;
 
 const handleMove = e => {
-  if (stopRocket) {
-    stopRocket();
-  }
+  // if (stopRocket) {
+  //   stopRocket();
+  // }
   if (e.touches) {
     e.preventDefault();
   }
@@ -170,29 +170,29 @@ document.addEventListener('touchend', handleClick);
 
 const stop = runWithFps(draw, 20);
 
-const pos = t => {
-  const x = width / 2 + Math.sin(t * 3) * 2;
-  const y = height - t * 4;
-  return [x, y];
-};
-const stopRocket = tweeen(
-  0,
-  100,
-  t => {
-    const [x, y] = pos(t);
-    mouseTrack.push([x, y]);
-    mouseTrack = mouseTrack.slice(-2);
-    emitParticles(x, y);
+// const pos = t => {
+//   const x = width / 2 + Math.sin(t * 3) * 2;
+//   const y = height - t * 4;
+//   return [x, y];
+// };
+// const stopRocket = tweeen(
+//   0,
+//   100,
+//   t => {
+//     const [x, y] = pos(t);
+//     mouseTrack.push([x, y]);
+//     mouseTrack = mouseTrack.slice(-2);
+//     emitParticles(x, y);
 
-    if (t === 100) {
-      fireworks(x * PIXEL_RATIO, y * PIXEL_RATIO);
-    }
-  },
-  {
-    duration: 2000,
-    easing: eases.quadInOut
-  }
-);
+//     if (t === 100) {
+//       fireworks(x * PIXEL_RATIO, y * PIXEL_RATIO);
+//     }
+//   },
+//   {
+//     duration: 2000,
+//     easing: eases.quadInOut
+//   }
+// );
 
 // Handle hot module replacement
 if (module.hot) {
