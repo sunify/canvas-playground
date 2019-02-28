@@ -23,7 +23,7 @@ export default class Point {
 
   update(width, height) {
     this.vel.add(this.acc);
-    this.vel.multS(this.friction);
+    this.vel.mult(this.friction);
     this.pos.add(this.vel);
 
     if (this.pos.x > width) {

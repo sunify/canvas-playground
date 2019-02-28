@@ -62,7 +62,7 @@ const draw = () => {
     p.update();
     const trace = p.vel
       .clone()
-      .multS(2)
+      .mult(2)
       .divS(PIXEL_RATIO)
       .add(p.pos);
 
