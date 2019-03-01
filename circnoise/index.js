@@ -18,7 +18,33 @@ noiseCanvas.height = 200;
 let t = 0;
 let t2 = 0;
 let progressOffset = 0;
+let stream;
+let source;
+let analyzer;
+const audioCtx = new AudioContext();
+navigator.mediaDevices
+  .getUserMedia({ audio: true })
+  .then(microphoneStream => {
+    stream = microphoneStream;
+    source = audioCtx.createMediaStreamSource(microphoneStream);
+    analyzer = audioCtx.createAnalyser();
+    analyzer.fftSize = 128;
+    analyzer.smoothingTimeConstant = 0.3;
+    source.connect(analyzer);
+  })
+  .catch(err => {
+    console.log(err);
+  });
 const draw = () => {
+  let freqs = [];
+  if (analyzer) {
+    const src = new Uint8Array(analyzer.frequencyBinCount);
+    analyzer.getByteFrequencyData(src);
+    // console.log(src);
+    freqs = Array.from(src)
+      .map(f => f / 256)
+      .reverse();
+  }
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = '#000';
   ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -31,18 +57,31 @@ const draw = () => {
   progressOffset += params.colorSpeed / 10;
   t = t2;
   for (let j = 0; j < params.iterations; j += 1) {
-    t += 0.01;
+    // console.log(freqs.length, params.iterations)
+    const freq2 = freqs[j % freqs.length] || 0;
+    t += 0.01 + freq2 * 10000;
     ctx.beginPath();
     const progress = j / params.iterations;
     for (let i = 0; i <= params.segments; i += 1) {
       const angle = ((Math.PI * 2) / params.segments) * i;
       const xoff =
-        ((Math.cos(angle - t / 1) + 1) / 2) * 2 * params.noiseFrequency * 20;
+        ((Math.cos(angle - t / 1) + 1) / 2) *
+        2 *
+        params.noiseFrequency *
+        20 *
+        freq2 *
+        5;
       const yoff =
-        ((Math.sin(angle + t / 2) + 1) / 2) * 2 * params.noiseFrequency * 20;
-      const n = (noise.noise2D(xoff, yoff) + 1) * params.noiseAmplitude;
+        ((Math.sin(angle + t / 2) + 1) / 2) *
+        2 *
+        params.noiseFrequency *
+        20 *
+        freq2 *
+        5;
+      const n =
+        (noise.noise2D(xoff, yoff) + 1) * (params.noiseAmplitude * freq2 * 2);
 
-      const [x, y] = shapes[params.shape](angle, n, progress);
+      const [x, y] = shapes[params.shape](angle, n, progress, freq2);
 
       if (i === 0) {
         ctx.moveTo(x, y);
@@ -53,10 +92,12 @@ const draw = () => {
 
     ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.fillStyle = params.colors(
-      eases.bounceInOut(Math.min((progress + progressOffset) % 1, 1))
+      eases.bounceInOut(
+        Math.min((progress + progressOffset + freq2 / 10) % 1, 1)
+      )
     );
 
-    if (j === 0) {
+    if (j === 1) {
       ctx.shadowColor = lerp(ctx.fillStyle, 'rgba(#FFF, 0)', 0.2);
       ctx.shadowBlur = 400;
     } else {
