@@ -21,29 +21,40 @@ let progressOffset = 0;
 let stream;
 let source;
 let analyzer;
-const audioCtx = new AudioContext();
-navigator.mediaDevices
-  .getUserMedia({ audio: true })
-  .then(microphoneStream => {
-    stream = microphoneStream;
-    source = audioCtx.createMediaStreamSource(microphoneStream);
-    analyzer = audioCtx.createAnalyser();
-    analyzer.fftSize = 128;
-    analyzer.smoothingTimeConstant = 0.3;
-    source.connect(analyzer);
-  })
-  .catch(err => {
-    console.log(err);
-  });
+const getMicro = () => {
+  const audioCtx = new AudioContext();
+  navigator.mediaDevices
+    .getUserMedia({ audio: true })
+    .then(microphoneStream => {
+      stream = microphoneStream;
+      source = audioCtx.createMediaStreamSource(microphoneStream);
+      const filter = audioCtx.createBiquadFilter();
+      filter.frequency.value = 1000.0;
+      filter.type = 'peaking';
+      analyzer = audioCtx.createAnalyser();
+      analyzer.fftSize = 128;
+      analyzer.smoothingTimeConstant = 0.3;
+      source.connect(filter);
+      filter.connect(analyzer);
+    })
+    .catch(err => {
+      console.log(err);
+    });
+};
+
+setTimeout(() => {
+  getMicro();
+}, 1000);
+// setTimeout(() => {
+//   getMicro();
+// }, 5000);
 const draw = () => {
   let freqs = [];
   if (analyzer) {
     const src = new Uint8Array(analyzer.frequencyBinCount);
     analyzer.getByteFrequencyData(src);
-    // console.log(src);
-    freqs = Array.from(src)
-      .map(f => f / 256)
-      .reverse();
+    console.log(src);
+    freqs = Array.from(src).map(f => f / 1024);
   }
   ctx.globalCompositeOperation = 'source-over';
   ctx.fillStyle = '#000';
@@ -93,7 +104,7 @@ const draw = () => {
     ctx.strokeStyle = 'rgba(0,0,0,0.2)';
     ctx.fillStyle = params.colors(
       eases.bounceInOut(
-        Math.min((progress + progressOffset + freq2 / 10) % 1, 1)
+        Math.min((progress + progressOffset + freq2 / 5) % 1, 1)
       )
     );
 

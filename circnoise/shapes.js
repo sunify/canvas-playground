@@ -23,7 +23,8 @@ function heartCoords(angle, n, progress, freq) {
 }
 
 function circleCoords(angle, n, progress, freq) {
-  const r = (Math.min(height, width) * (1 - progress) + n * 20) / 2 + freq * 20;
+  const r =
+    (Math.min(height, width) * (1 - progress) + n * 20) / 2 + freq * 200;
   const x = r * Math.cos(angle) + (width * PIXEL_RATIO) / 2;
   const y = r * Math.sin(angle) + (height * PIXEL_RATIO) / 2;
 

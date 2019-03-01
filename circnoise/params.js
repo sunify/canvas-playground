@@ -17,14 +17,14 @@ export const params = {
   colors: lerp(...initialColors, ...initialColors),
   segments: 100,
   iterations: 50,
-  palette: 0,
+  palette: 1,
   noiseFrequency: 5,
-  noiseAmplitude: 0.3,
+  noiseAmplitude: 10,
   speed: 0.1,
   colorSpeed: 0.1,
   strokeWeight: 0.5,
   stroke: false,
-  shape: 'heart',
+  shape: 'circle',
   save() {
     downloadCanvas(`${params.shape}-${Date.now()}`);
   },
