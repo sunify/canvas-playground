@@ -10,14 +10,15 @@ const palettes = [
   ['#820263', '#d90368', '#53dd6c', '#2e294e', '#ffd400']
 ];
 
-const initialColors = shuffle([...palettes[0]]);
+const defaultPalette = 1;
+const initialColors = shuffle([...palettes[defaultPalette]]);
 
 export const params = {
   colorsArr: initialColors,
   colors: lerp(...initialColors, ...initialColors),
   segments: 100,
   iterations: 50,
-  palette: 1,
+  palette: defaultPalette,
   noiseFrequency: 5,
   noiseAmplitude: 10,
   speed: 0.1,

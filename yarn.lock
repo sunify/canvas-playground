@@ -2502,7 +2502,7 @@ lerp-array@^1.1.1:
   dependencies:
     lerp "^1.0.0"
 
-lerp@^1.0.0:
+lerp@^1.0.0, lerp@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/lerp/-/lerp-1.0.3.tgz#a18c8968f917896de15ccfcc28d55a6b731e776e"
 

@@ -8,6 +8,7 @@
     "chaikin-smooth": "^1.0.4",
     "dat.gui": "^0.7.5",
     "eases": "^1.0.8",
+    "lerp": "^1.0.3",
     "lodash": "^4.17.11",
     "memoize": "^0.1.1",
     "run-with-fps": "^1.0.4",
