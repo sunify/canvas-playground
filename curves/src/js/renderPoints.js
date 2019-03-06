@@ -19,7 +19,7 @@ export default function renderPoints(points, ctx) {
     p.update();
     const offset = p.vel
       .clone()
-      .mult(2.6)
+      .mult(2)
       .div(PIXEL_RATIO)
       .add(p.pos);
     ctx.beginPath();

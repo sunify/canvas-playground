@@ -19,7 +19,11 @@ export default function emitPoints([v1, v2], width, height) {
     const angle = baseAngle + (Math.PI / 4) * (0.5 - Math.random()); // spread particles a little
     const len = (Math.max(-10, -10 * (baseLen / 5)) * Math.random()) / 2;
     points.push([
-      new Point(v2.clone(), Vector.polar(angle, len), Vector.polar(angle, 2)),
+      new Point(
+        v2.clone(),
+        Vector.polar(angle, len),
+        Vector.polar(angle, len / 10)
+      ),
       Date.now() + 100 * Math.random(),
       angle
     ]);
