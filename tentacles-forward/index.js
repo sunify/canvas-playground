@@ -18,7 +18,7 @@ const center = Vector.cartesian(width / 2, height / 2);
 for (let j = 0; j < count; j += 1) {
   const baseAngle = ((Math.PI * 2) / count) * j;
   const root = new Segment(
-    Vector.polar(baseAngle, 65).add(center),
+    Vector.polar(baseAngle, 100).add(center),
     10,
     baseAngle
   );
@@ -37,7 +37,7 @@ for (let j = 0; j < count; j += 1) {
 const draw = () => {
   canvas.width = canvas.width;
   segs.forEach(([root]) => {
-    root.colorBase += 5;
+    root.colorBase += 1;
     root.update();
   });
   for (let k = 0; k < size; k += 1) {
