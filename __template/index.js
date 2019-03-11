@@ -1,5 +1,6 @@
 import runWithFps from 'run-with-fps';
 import { canvas, ctx, PIXEL_RATIO } from './setup';
+import { params } from './params';
 
 const draw = () => {
   canvas.width = canvas.width;
