@@ -39,7 +39,6 @@ noiseCanvas.height = 200;
 let t = 0;
 let t2 = 0;
 let progressOffset = 0;
-let stream;
 let source;
 let analyzer;
 const getMicro = () => {
@@ -47,7 +46,6 @@ const getMicro = () => {
   navigator.mediaDevices
     .getUserMedia({ audio: true })
     .then(microphoneStream => {
-      stream = microphoneStream;
       source = audioCtx.createMediaStreamSource(microphoneStream);
 
       analyzer = audioCtx.createAnalyser();
